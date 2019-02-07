@@ -51,15 +51,17 @@ else if (command === "movie-this") {
         axios.get(queryUrl)
             .then(
                 function (response) {
-                    console.log(response);
-                    console.log(response.data.Title);
-                    console.log(response.data.Year);
-                    console.log(response.data.imdbRating);
-                    console.log(response.data.Metascore);
-                    console.log(response.data.Country);
-                    console.log(response.data.Language);
-                    console.log(response.data.Plot);
-                    console.log(response.data.Actors);
+                    // console.log(response);
+                    console.log("--------MOVIE INFO-----------");
+                    console.log("Title: " + response.data.Title);
+                    console.log("Year: " + response.data.Year);
+                    console.log("IMDB Rating: " + response.data.imdbRating);
+                    console.log("MetaScore: " + response.data.Metascore);
+                    console.log("Country: " + response.data.Country);
+                    console.log("Language: " + response.data.Language);
+                    console.log("Plot: " + response.data.Plot);
+                    console.log("Actors: " + response.data.Actors);
+                    console.log("--------Completed-----------");
                 }
             ).catch(
                 function (error) {
