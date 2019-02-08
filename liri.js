@@ -3,22 +3,57 @@ var Spotify = require('node-spotify-api');
 var keys = require("./keys.js");
 var spotify = new Spotify(keys.spotify);
 var axios = require("axios");
+var fs = require("fs");
+
+
+// Take two arguments.
+// The first will be the action (i.e. "deposit", "withdraw", etc.)
+// The second will be the amount that will be added, withdrawn, etc.
+var command = process.argv[2];
+// var value = process.argv[3];
+
+// We will then create a switch-case statement (if-else would also work).
+// The switch-case will direct which function gets run.
+// switch (command) {
+//     case "spotify-this-song":
+//         spotifyThisSong();
+//         break
+
+//     case "movie-this":
+//         movieThis();
+//         break;
+
+//     case "do-what-it-says":
+//         doWhatItSays();
+//         break;
+
+//     // case "lotto":
+//     //   lotto();
+//     //   break;
+// };
+var dict = {
+    "spotify-this-song": spotifyThisSong,
+    "movie-this": movieThis,
+    "do-what-it-says": doWhatItSays,
+    "stocks-exchange": stocksExchange
+};
+dict[command]();
 
 
 // -------------------
 
-var command = process.argv[2];
-
-if (command === "spotify-this-song") {
+function spotifyThisSong() {
 
     var songName = process.argv.slice(3).join("+");
 
-    if (songName !== "") {
+    if (typeof songName === "string" && songName.length > 0) {
         spotify.search({ type: 'track', query: songName, limit: 5 })
             .then(function (response) {
                 // console.log(response);
                 console.log("-------- Track Info -------");
-                // console.log("-------------NAME ^^^--------");
+
+                // console.log(JSON.stringify(response, null, 2));
+
                 console.log(response.tracks.items[0].album.artists[0].name);
                 console.log(response.tracks.items[0].name);
                 console.log(response.tracks.items[0].preview_url);
@@ -34,14 +69,12 @@ if (command === "spotify-this-song") {
         console.log("The Sign");
         console.log("Ace of Base");
     }
-}
-else if (command === "movie-this") {
+};
+function movieThis() {
 
     var movieName = process.argv.slice(3).join('+');
 
     if (movieName !== "") {
-        // console.log(arg);
-        console.log(movieName);
         // Then run a request with axios to the OMDB API with the movie specified
         var queryUrl = "http://www.omdbapi.com/?t=" + movieName + "&y=&plot=short&apikey=trilogy";
 
@@ -70,33 +103,61 @@ else if (command === "movie-this") {
             );
     }
     else {
-        var noMovie = "Mr. Nobody";
-        noMovie.split(' ').join('+');
-        var queryUrl = "http://www.omdbapi.com/?t=" + noMovie + "&y=&plot=short&apikey=trilogy";
-
-        // This line is just to help us debug against the actual URL.
-        // console.log(queryUrl);
-        // Then create a request with axios to the queryUrl
-        axios.get(queryUrl)
-            .then(
-                function (response) {
-                    console.log('If you haven'+'t watched "Mr. Nobody," then you should: http://www.imdb.com/title/tt0485947/');
-                    console.log("It's on Netflix!");
-                }
-            ).catch(
-                function (error) {
-                    console.log(error);
-                }
-            );
+        console.log('If you haven' + 't watched "Mr. Nobody," then you should: http://www.imdb.com/title/tt0485947/');
+        console.log("It's on Netflix!");
     }
 
-}
-else if (command === "do-what-it-says") {
-
-}
-else if (command === "#") {
-
-}
-else {
 
 };
+function doWhatItSays() {
+    fs.readFile("random.txt", "utf8", function (error, data) {
+
+        // If the code experiences any errors it will log the error to the console.
+        if (error) {
+            return console.log(error);
+        }
+
+        // We will then print the contents of data
+        console.log(data);
+
+        // Then split it by commas (to make it more readable)
+        var dataArr = data.split(",");
+
+        // We will then re-display the content as an array for later use.
+        console.log(dataArr);
+
+        // console.log(dict[dataArr[0]]());
+        console.log(dict[dataArr[0]]);
+
+    });
+};
+function stocksExchange() {
+    var stockName = process.argv[3];
+
+
+
+    var queryUrl = "https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol="
+        + stockName + "&interval=5min&apikey=FR5J687E5KLURB1P";
+
+    // This line is just to help us debug against the actual URL.
+    // console.log(queryUrl);
+    // Then create a request with axios to the queryUrl
+    axios.get(queryUrl)
+        .then(
+            function (response) {
+                // console.log(response);
+
+
+                
+                //WONT STRINGIFY: 
+                // console.log(JSON.stringify(response, null, 2));
+                console.log(response.data);
+
+
+            }
+        ).catch(
+            function (error) {
+                console.log(error);
+            }
+        );
+}
