@@ -5,32 +5,8 @@ var spotify = new Spotify(keys.spotify);
 var axios = require("axios");
 var fs = require("fs");
 
-
-// Take two arguments.
-// The first will be the action (i.e. "deposit", "withdraw", etc.)
-// The second will be the amount that will be added, withdrawn, etc.
 var command = process.argv[2];
-// var value = process.argv[3];
 
-// We will then create a switch-case statement (if-else would also work).
-// The switch-case will direct which function gets run.
-// switch (command) {
-//     case "spotify-this-song":
-//         spotifyThisSong();
-//         break
-
-//     case "movie-this":
-//         movieThis();
-//         break;
-
-//     case "do-what-it-says":
-//         doWhatItSays();
-//         break;
-
-//     // case "lotto":
-//     //   lotto();
-//     //   break;
-// };
 var dict = {
     "spotify-this-song": spotifyThisSong,
     "movie-this": movieThis,
@@ -45,7 +21,13 @@ dict[command]();
 function spotifyThisSong() {
 
     var songName = process.argv.slice(3).join("+");
-
+    console.log(arguments);
+    if (arguments.length > 0) {
+        songName = arguments[0];
+    }
+    spotifyThisSongHelper(songName);
+};
+function spotifyThisSongHelper(songName) {
     if (typeof songName === "string" && songName.length > 0) {
         spotify.search({ type: 'track', query: songName, limit: 5 })
             .then(function (response) {
@@ -69,10 +51,19 @@ function spotifyThisSong() {
         console.log("The Sign");
         console.log("Ace of Base");
     }
-};
+}
 function movieThis() {
-
     var movieName = process.argv.slice(3).join('+');
+    console.log(arguments);
+    if (arguments.length > 0) {
+        movieName = arguments[0];
+    }
+
+    movieThisHelper(movieName);
+
+};
+
+function movieThisHelper(movieName) {
 
     if (movieName !== "") {
         // Then run a request with axios to the OMDB API with the movie specified
@@ -107,8 +98,7 @@ function movieThis() {
         console.log("It's on Netflix!");
     }
 
-
-};
+}
 function doWhatItSays() {
     fs.readFile("random.txt", "utf8", function (error, data) {
 
@@ -118,26 +108,33 @@ function doWhatItSays() {
         }
 
         // We will then print the contents of data
-        console.log(data);
+        // console.log(data);
 
         // Then split it by commas (to make it more readable)
-        var dataArr = data.split(",");
 
-        // We will then re-display the content as an array for later use.
-        console.log(dataArr);
+        var lines = data.split('\n');
+        for (var i = 0; i < lines.length; i++) {
+            var dataArr = lines[i].split(",");
 
-        // console.log(dict[dataArr[0]]());
-        console.log(dict[dataArr[0]]);
+            // We will then re-display the content as an array for later use.
+            console.log(dataArr);
+
+            dict[dataArr[0]](dataArr[1]);
+        }
 
     });
 };
 function stocksExchange() {
     var stockName = process.argv[3];
+    console.log(arguments);
+    if (arguments.length > 0) {
+        stockName = arguments[0];
+    }
+    stocksExchangeHelper(stockName);
 
-
-
-    var queryUrl = "https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol="
-        + stockName + "&interval=5min&apikey=FR5J687E5KLURB1P";
+}
+function stocksExchangeHelper(stockName) {
+    var queryUrl = "https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=" + stockName + "&interval=5min&apikey=FR5J687E5KLURB1P";
 
     // This line is just to help us debug against the actual URL.
     // console.log(queryUrl);
@@ -146,11 +143,7 @@ function stocksExchange() {
         .then(
             function (response) {
                 // console.log(response);
-
-
-                
-                //WONT STRINGIFY: 
-                // console.log(JSON.stringify(response, null, 2));
+                // console.log(JSON.stringify(response.data, null, 2));
                 console.log(response.data);
 
 
